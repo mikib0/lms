@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example Form</title>
+  </head>
+  <body>
+    <h1>Example Form</h1>
+    <form id='example-form'>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name"><br><br>
+      <label for="image">Image:</label>
+      <input type="file" id="image" name="image"><br><br>
+      <input type="submit" value="Submit">
+    </form>
+
+    <script>
+      document.getElementById('example-form').addEventListener('submit',
+      function submitForm(e) {
+        const form = document.getElementById('example-form');
+        e.preventDefault()
+        const formData = new FormData(form);
+
+        const name = formData.get('name');
+        const image = formData.get('image');
+
+        // Do any additional validation or processing of the form data here
+
+        // Construct a new FormData object with the processed form data
+        const processedFormData = new FormData();
+        processedFormData.append('name', name);
+        processedFormData.append('image', image);
+        console.log(Object.fromEntries(processedFormData))
+        console.log(Object.fromEntries(formData))
+
+        // Send a POST request to the server with the processed form data
+        fetch('/submit-form', {
+          method: 'POST',
+          body: processedFormData
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      })
+    </script>
+  </body>
+</html>

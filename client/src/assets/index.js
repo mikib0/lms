@@ -1,0 +1,1 @@
+export {default as chappie} from './chappie.jpg'
