@@ -27,11 +27,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('../client/dist'));
 
 app.get('/api/user', authentication, (req, res) => {
   res.json(req.user);
