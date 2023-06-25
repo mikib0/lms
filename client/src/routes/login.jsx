@@ -4,6 +4,7 @@ import {
   Container,
   Flex,
   Group,
+  Highlight,
   PasswordInput,
   Text,
   TextInput,
@@ -19,21 +20,21 @@ import { authenticate } from '../services';
 
 export async function action({ request }) {
   const loginData = Object.fromEntries(await request.formData());
-  try{
+  try {
     await authenticate(loginData);
     return redirect('/');
-  } catch(err){
-    if(err instanceof LoginError){
-       return err
+  } catch (err) {
+    if (err instanceof LoginError) {
+      return err;
     } else {
-      throw err
+      throw err;
     }
   }
 }
 
 export default function Login() {
-  const error = useActionData()
-  const [showErr, setShowErr] = useState(false)
+  const error = useActionData();
+  const [showErr, setShowErr] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -43,16 +44,16 @@ export default function Login() {
     },
   });
 
-  useEffect(()=>{
-    let timeout
-    if(error?.message){
+  useEffect(() => {
+    let timeout;
+    if (error?.message) {
       setShowErr(error instanceof LoginError);
-      timeout = setTimeout(()=>setShowErr(false), 3000)
-      }
-    return ()=> {
-      if (timeout) clearTimeout(timeout)
+      timeout = setTimeout(() => setShowErr(false), 3000);
     }
-  }, [error])
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [error]);
 
   return (
     <>
@@ -61,10 +62,10 @@ export default function Login() {
         <Text>Sign in to your account</Text>
       </Flex>
       <Container w={{ base: 300 }}>
-      <Text size='sm' color='red' display={showErr ? 'block' : 'none'}>
-        {error?.message}
-      </Text>
-        <Form method='post'>
+        <Text size='sm' color='red' display={showErr ? 'block' : 'none'}>
+          {error?.message}
+        </Text>
+        <Form id='loginForm' method='post'>
           <TextInput
             withAsterisk
             name='email'
@@ -88,6 +89,21 @@ export default function Login() {
               Login
             </Button>
           </Group>
+          <details style={{ marginTop: 8 }}>
+            <summary>Expand for Guest login</summary>
+            <ul style={{ margin: 0, padding: 0, marginTop: 4, paddingLeft: 24 }}>
+              <li>
+                <Highlight size='xs' highlight={['admin@guest.com', 'guest']}>
+                  use admin@guest.com and guest for admin login
+                </Highlight>
+              </li>
+              <li>
+                <Highlight size='xs' highlight={['student@guest.com', 'guest']}>
+                  use student@guest.com and guest for student login
+                </Highlight>
+              </li>
+            </ul>
+          </details>
         </Form>
       </Container>
     </>
