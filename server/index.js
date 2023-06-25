@@ -213,7 +213,7 @@ app.post('/api/login', async (req, res) => {
     id: user.id,
     isAdmin: user.isAdmin,
   };
-  const token = jwt.sign(userForToken, process.env.secretKey); // TODO this is bad
+  const token = jwt.sign(userForToken, process.env.secretKey);
   res.cookie('jwt', token, {
     httpOnly: true,
     maxAge: 86400000, // 24 hours
@@ -234,5 +234,5 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Example app listening on port:${port}`);
 });
