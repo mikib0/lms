@@ -106,6 +106,9 @@ app.put('/api/students', authentication, upload.single('image'), async (req, res
   const id = req.user.id;
   const update = req.body;
   const isPasswordChange = !!update.newPassword
+  if(id == 1){
+    return res.status(403).json({ error: 'Can\'t guest account.' })
+  }
   if(isPasswordChange){
     const user = await Student.findOne({ where: { id } });
     const passwordCorrect = await bcrypt.compare(update.oldPassword, user.passwordHash)
