@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express';
 import { hash } from 'bcrypt';
 import bodyParser from 'body-parser';
@@ -212,7 +213,7 @@ app.post('/api/login', async (req, res) => {
     id: user.id,
     isAdmin: user.isAdmin,
   };
-  const token = jwt.sign(userForToken, 'tilde00'); // TODO this is bad
+  const token = jwt.sign(userForToken, process.env.secretKey); // TODO this is bad
   res.cookie('jwt', token, {
     httpOnly: true,
     maxAge: 86400000, // 24 hours

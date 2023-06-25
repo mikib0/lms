@@ -7,8 +7,7 @@ export default function (req, res, next) {
     return res.status(401).send('Unauthorized');
   }
 
-  jwt.verify(token, 'tilde00', (err, decoded) => {
-    // TODO this is bad
+  jwt.verify(token, process.env.secretKey, (err, decoded) => {
     if (err) {
       return res.status(401).send('Unauthorized');
     }
