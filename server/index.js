@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'dotenv/config';
 import express from 'express';
 import { hash } from 'bcrypt';
 import bodyParser from 'body-parser';
@@ -31,7 +31,7 @@ const port = process.env.PORT;
 
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.static('../client/dist'));
+app.use(express.static('/home/mikibo/lms/client/dist'));
 
 app.get('/api/user', authentication, (req, res) => {
   res.json(req.user);
@@ -103,29 +103,40 @@ app.get('/api/students/:student_id', async (req, res) => {
   res.json(await Student.findOne({ where: { id } }));
 });
 
-app.put('/api/students', authentication, upload.single('image'), async (req, res) => {
-  const id = req.user.id;
-  const update = req.body;
-  const isPasswordChange = !!update.newPassword
-  if(isPasswordChange){
-    const user = await Student.findOne({ where: { id } });
-    const passwordCorrect = await bcrypt.compare(update.oldPassword, user.passwordHash)
-    if(passwordCorrect){
-      const newPasswordHash = await hash(update.newPassword, 10);
-      await Student.update({passwordHash: newPasswordHash}, { where: { id } })
-      res.sendStatus(204)
-    } else{
-      res.status(400).json({ error: 'Wrong old password' })
+app.put(
+  '/api/students',
+  authentication,
+  upload.single('image'),
+  async (req, res) => {
+    const id = req.user.id;
+    const update = req.body;
+    const isPasswordChange = !!update.newPassword;
+    if (isPasswordChange) {
+      const user = await Student.findOne({ where: { id } });
+      const passwordCorrect = await bcrypt.compare(
+        update.oldPassword,
+        user.passwordHash
+      );
+      if (passwordCorrect) {
+        const newPasswordHash = await hash(update.newPassword, 10);
+        await Student.update(
+          { passwordHash: newPasswordHash },
+          { where: { id } }
+        );
+        res.sendStatus(204);
+      } else {
+        res.status(400).json({ error: 'Wrong old password' });
+      }
+      return;
     }
-    return
-  }
 
-  if(req.file){
-    update.profileImage = req.file.filename
+    if (req.file) {
+      update.profileImage = req.file.filename;
+    }
+    await Student.update(update, { where: { id } });
+    res.json(await Student.findOne({ where: { id } }));
   }
-  await Student.update(update, { where: { id } });
-  res.json(await Student.findOne({ where: { id } }));
-});
+);
 
 app.get('/api/orders', authentication, async (req, res) => {
   if (req.user.isAdmin) return res.json(await Order.findAll());
@@ -153,10 +164,12 @@ app.patch('/api/orders/:id', authentication, async (req, res) => {
 
   await Order.update({ status }, { where: { id } });
 
-  if (status == 'completed'){
-  const order = await Order.findOne({ where: { id } })
-  const {email, firstName} = await Student.findOne({ where: { id: order.orderedBy } })
-  await sendMail(email, firstName)
+  if (status == 'completed') {
+    const order = await Order.findOne({ where: { id } });
+    const { email, firstName } = await Student.findOne({
+      where: { id: order.orderedBy },
+    });
+    await sendMail(email, firstName);
   }
   res.json(await Order.findAll());
 });
@@ -168,8 +181,8 @@ app.put('/api/orders/:order_id', authentication, async (req, res) => {
 });
 
 app.post('/api/feedbacks', authentication, async (req, res) => {
-  const feedback = req.body
-  feedback.feedbackBy = req.user.id
+  const feedback = req.body;
+  feedback.feedbackBy = req.user.id;
   await Feedback.create(feedback);
   res.sendStatus(200).end();
 });
@@ -213,7 +226,7 @@ app.post('/api/login', async (req, res) => {
     id: user.id,
     isAdmin: user.isAdmin,
   };
-  const token = jwt.sign(userForToken, process.env.secretKey);
+  const token = jwt.sign(userForToken, process.env.secretKey); // TODO this is bad
   res.cookie('jwt', token, {
     httpOnly: true,
     maxAge: 86400000, // 24 hours
@@ -234,5 +247,5 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port:${port}`);
+  console.log(`Example app listening at http://localhost:${port}`);
 });
