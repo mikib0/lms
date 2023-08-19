@@ -187,13 +187,11 @@ app.post('/api/feedbacks', authentication, async (req, res) => {
   res.sendStatus(200).end();
 });
 
-app.get('/api/feedbacks', async (req, res) => {
+app.get('/api/feedbacks', authentication, adminAuth, async (req, res) => {
   const result = await Feedback.findAll({
     include: {
       model: Student,
-      on: {
-        feedbackBy: sequelize.col('Student.id'),
-      },
+      required: true,
     },
   });
   const feebacks = result.map(
