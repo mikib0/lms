@@ -2,4 +2,5 @@ client/node_modules/
 client/.vscode/
 client/dist/
 server/node_modules/
+server/images
 .env

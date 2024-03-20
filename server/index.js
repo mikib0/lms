@@ -31,7 +31,7 @@ const port = process.env.PORT;
 
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.static('/home/mikibo/lms/client/dist'));
+app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
 
 app.get('/api/user', authentication, (req, res) => {
   res.json(req.user);
